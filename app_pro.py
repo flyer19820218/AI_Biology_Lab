@@ -13,7 +13,7 @@ st.set_page_config(page_title="生物 AI 生命真理研究室", layout="wide")
 
 st.markdown("""
     <style>
-    /* 1. 強制背景鎖定為白色 (白晝協議) */
+    /* 1. 強制背景鎖定為白色 */
     .stApp, [data-testid="stAppViewContainer"], [data-testid="stHeader"], [data-testid="stToolbar"], .stMain {
         background-color: #ffffff !important;
     }
@@ -24,29 +24,31 @@ st.markdown("""
         font-family: 'HanziPen SC', '翩翩體', 'PingFang TC', 'Heiti TC', 'Microsoft JhengHei', sans-serif !important;
     }
 
-    /* 3. 針對【下拉選單 (拉把)】與【拍照區】的深度補光 */
-    /* 下拉選單本體與文字顏色 */
+    /* 3. 針對【打字提問區】與【拍照截圖區】的深度補光 (強制白底黑字) */
+    /* 打字輸入框本體 */
+    div[data-testid="stTextInput"] input {
+        background-color: #ffffff !important;
+        color: #000000 !important;
+        border: 2px solid #000000 !important;
+    }
+    /* 拍照上傳區邊框與內部背景 */
+    [data-testid="stFileUploader"] section {
+        background-color: #ffffff !important;
+        color: #000000 !important;
+        border: 2px dashed #000000 !important;
+    }
+    /* 修正上傳區內部的文字與提示 */
+    [data-testid="stFileUploader"] div, [data-testid="stFileUploader"] span, [data-testid="stFileUploader"] p {
+        color: #000000 !important;
+    }
+    
+    /* 4. 下拉選單 (拉把) 鎖定 */
     div[data-baseweb="select"], div[data-baseweb="select"] > div {
         background-color: #ffffff !important;
         color: #000000 !important;
     }
-    /* 下拉選單展開後的選項清單 */
-    ul[role="listbox"], li[role="option"] {
-        background-color: #ffffff !important;
-        color: #000000 !important;
-    }
-    /* 拍照上傳區 */
-    section[data-testid="stFileUploader"], [data-testid="stFileUploader"] div {
-        background-color: #ffffff !important;
-        color: #000000 !important;
-    }
-    /* 修正所有標籤文字顏色 (確保第一門、第幾頁等文字不消失) */
-    label[data-testid="stWidgetLabel"] p {
-        color: #000000 !important;
-        font-weight: bold !important;
-    }
 
-    /* 4. 您的黃色導覽框鎖定 */
+    /* 5. 您的黃色導覽框鎖定 */
     .guide-box {
         background-color: #fff9c4 !important;
         color: #000000 !important;
@@ -56,7 +58,7 @@ st.markdown("""
         margin-bottom: 20px;
     }
 
-    /* 5. 按鈕防黑修正：維持您的淺藍色風格 */
+    /* 6. 按鈕防黑修正：維持您的淺藍色風格 */
     div.stButton > button {
         background-color: #e1f5fe !important; 
         color: #000000 !important;
@@ -69,15 +71,16 @@ st.markdown("""
         opacity: 1 !important;
     }
 
-    /* 6. LaTeX 公式顏色鎖定 */
+    /* 7. LaTeX 公式顏色鎖定 */
     .katex {
         color: #000000 !important;
     }
-    
-    /* 針對手機暗色模式的額外強制力 */
+
+    /* 針對手機暗色模式的硬性覆蓋 */
     @media (prefers-color-scheme: dark) {
-        .stApp, div[data-baseweb="select"], section[data-testid="stFileUploader"] {
+        .stApp, div[data-testid="stTextInput"] input, section[data-testid="stFileUploader"] {
             background-color: #ffffff !important;
+            color: #000000 !important;
         }
     }
     </style>
@@ -105,7 +108,7 @@ def get_pdf_page_image(pdf_path, page_index):
     doc.close()
     return img_data
 
-# --- 4. 生物講義 26 頁熱血中二標題 (完整保留) ---
+# --- 4. 生物講義 26 頁熱血中二標題 ---
 page_titles = {
     1: "【視覺的覺醒——顯微鏡的物理法則】", 
     2: "【影像的禁忌與雙重存在——複式 vs 解剖】", 
