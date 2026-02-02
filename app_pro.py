@@ -8,35 +8,45 @@ import re
 import base64
 from PIL import Image
 
-# --- 1. 頁面配置 (全能適配 + 強制白晝協議強化版) ---
+# --- 1. 頁面配置 (全平台抗暗色模式 & 翩翩體鎖定) ---
 st.set_page_config(page_title="生物 AI 生命真理研究室", layout="wide")
 
 st.markdown("""
     <style>
-    /* 1. 強制背景鎖定為白色 (白晝協議 - 包含手機系統級覆蓋) */
+    /* 1. 強制背景鎖定為白色 (白晝協議) */
     .stApp, [data-testid="stAppViewContainer"], [data-testid="stHeader"], [data-testid="stToolbar"], .stMain {
         background-color: #ffffff !important;
     }
 
-    /* 針對手機「深色模式」的硬性反射指令 */
-    @media (prefers-color-scheme: dark) {
-        .stApp, [data-testid="stAppViewContainer"], [data-testid="stHeader"], [data-testid="stToolbar"], .stMain {
-            background-color: #ffffff !important;
-        }
-        /* 確保暗色模式下的輸入框也是白的 */
-        input, select, textarea {
-            background-color: #ffffff !important;
-            color: #000000 !important;
-        }
-    }
-
-    /* 2. 鎖定全黑翩翩體與字體堆疊 */
+    /* 2. 鎖定全黑翩翩體 */
     html, body, [class*="css"], .stMarkdown, p, h1, h2, h3, span, label, li {
         color: #000000 !important;
         font-family: 'HanziPen SC', '翩翩體', 'PingFang TC', 'Heiti TC', 'Microsoft JhengHei', sans-serif !important;
     }
 
-    /* 3. 您的黃色導覽框鎖定 */
+    /* 3. 針對【下拉選單 (拉把)】與【拍照區】的深度補光 */
+    /* 下拉選單本體與文字顏色 */
+    div[data-baseweb="select"], div[data-baseweb="select"] > div {
+        background-color: #ffffff !important;
+        color: #000000 !important;
+    }
+    /* 下拉選單展開後的選項清單 */
+    ul[role="listbox"], li[role="option"] {
+        background-color: #ffffff !important;
+        color: #000000 !important;
+    }
+    /* 拍照上傳區 */
+    section[data-testid="stFileUploader"], [data-testid="stFileUploader"] div {
+        background-color: #ffffff !important;
+        color: #000000 !important;
+    }
+    /* 修正所有標籤文字顏色 (確保第一門、第幾頁等文字不消失) */
+    label[data-testid="stWidgetLabel"] p {
+        color: #000000 !important;
+        font-weight: bold !important;
+    }
+
+    /* 4. 您的黃色導覽框鎖定 */
     .guide-box {
         background-color: #fff9c4 !important;
         color: #000000 !important;
@@ -46,7 +56,7 @@ st.markdown("""
         margin-bottom: 20px;
     }
 
-    /* 4. 按鈕防黑修正：維持您的淺藍色風格，但強制不變黑 */
+    /* 5. 按鈕防黑修正：維持您的淺藍色風格 */
     div.stButton > button {
         background-color: #e1f5fe !important; 
         color: #000000 !important;
@@ -58,10 +68,17 @@ st.markdown("""
         font-size: 1.2rem !important;
         opacity: 1 !important;
     }
-    
-    /* 5. LaTeX 公式與連結顏色鎖定 */
-    .katex, a {
+
+    /* 6. LaTeX 公式顏色鎖定 */
+    .katex {
         color: #000000 !important;
+    }
+    
+    /* 針對手機暗色模式的額外強制力 */
+    @media (prefers-color-scheme: dark) {
+        .stApp, div[data-baseweb="select"], section[data-testid="stFileUploader"] {
+            background-color: #ffffff !important;
+        }
     }
     </style>
     """, unsafe_allow_html=True)
