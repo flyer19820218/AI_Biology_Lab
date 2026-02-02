@@ -8,29 +8,54 @@ import re
 import base64
 from PIL import Image
 
-# --- 1. 頁面配置 (全黑翩翩體、全黑文字、適應行動端) ---
+# --- 1. 頁面配置 (全平台抗暗色模式 & 翩翩體鎖定) ---
 st.set_page_config(page_title="生物 AI 生命真理研究室", layout="wide")
 
 st.markdown("""
     <style>
+    /* 1. 強制背景鎖定為白色 (防黑洞協議) */
+    .stApp, [data-testid="stAppViewContainer"], [data-testid="stHeader"], [data-testid="stToolbar"] {
+        background-color: #ffffff !important;
+    }
+
+    /* 2. 鎖定全黑翩翩體與字體堆疊 */
     html, body, [class*="css"], .stMarkdown, p, h1, h2, h3, span, label, li {
         color: #000000 !important;
-        font-family: 'HanziPen SC', '翩翩體', 'KaiTi', sans-serif !important;
+        font-family: 'HanziPen SC', '翩翩體', 'PingFang TC', 'Heiti TC', 'Microsoft JhengHei', sans-serif !important;
     }
+
+    /* 3. 您的黃色導覽框鎖定 */
     .guide-box {
-        background-color: #fff9c4;
+        background-color: #fff9c4 !important;
+        color: #000000 !important;
         padding: 15px;
         border-radius: 12px;
         border: 2px solid #fbc02d;
         margin-bottom: 20px;
     }
-    .stButton>button {
-        background-color: #e1f5fe !important;
-        border-radius: 8px;
-        font-weight: bold;
-        width: 100%;
-        height: 50px;
+
+    /* 4. 按鈕防黑修正：維持您的淺藍色風格，但強制背景不變黑 */
+    div.stButton > button {
+        background-color: #e1f5fe !important; /* 您的標誌淺藍色 */
+        color: #000000 !important;
+        border: 2px solid #01579b !important;
+        border-radius: 8px !important;
+        font-weight: bold !important;
+        width: 100% !important;
+        height: 50px !important;
         font-size: 1.2rem !important;
+        opacity: 1 !important;
+    }
+    
+    /* 5. 輸入框防黑修正 (防止手機輸入時變黑底) */
+    input {
+        color: #000000 !important;
+        background-color: #ffffff !important;
+    }
+
+    /* 6. LaTeX 公式顏色鎖定 */
+    .katex {
+        color: #000000 !important;
     }
     </style>
     """, unsafe_allow_html=True)
@@ -57,7 +82,7 @@ def get_pdf_page_image(pdf_path, page_index):
     doc.close()
     return img_data
 
-# --- 4. 生物講義 26 頁熱血中二標題 (精確修正版) ---
+# --- 4. 生物講義 26 頁熱血中二標題 (精確保留) ---
 page_titles = {
     1: "【視覺的覺醒——顯微鏡的物理法則】", 
     2: "【影像的禁忌與雙重存在——複式 vs 解剖】", 
@@ -90,7 +115,7 @@ page_titles = {
 # --- 5. 初始化 Session ---
 if 'audio_html' not in st.session_state: st.session_state.audio_html = None
 
-# --- 6. 核心 API 通行證指南 (絕對回歸) ---
+# --- 6. 核心 API 通行證指南 ---
 st.title("🔬 生物 AI 生命真理研究室 (助教版)")
 st.markdown("""
 <div class="guide-box">
@@ -125,7 +150,7 @@ if (student_q or uploaded_file) and user_key:
 
 st.divider()
 
-# --- 8. 生命四大門雙選單 (26 頁全對齊) ---
+# --- 8. 生命四大門雙選單 ---
 st.subheader("📖 翻開真理之書：選擇學習單元")
 parts_list = ["【第一門：微觀與鍊金】", "【二：循環與訊息】", "【三：遺傳與複寫】", "【四：分類與生態】"]
 part_choice = st.selectbox("第一步：選擇大章節", parts_list)
@@ -152,7 +177,7 @@ if st.button(f"🚀 啟動【第 {target_page} 頁】圖文導讀"):
                 page_img = get_pdf_page_image(path_finals, target_page - 1)
                 st.image(page_img, caption=f"講義：{page_titles[target_page]}", use_column_width=True)
                 
-                # 2. AI 講解 (講義優先，無測驗)
+                # 2. AI 講解
                 file_obj = genai.upload_file(path=path_finals)
                 model = genai.GenerativeModel('models/gemini-2.5-flash')
                 prompt = [
@@ -165,7 +190,7 @@ if st.button(f"🚀 啟動【第 {target_page} 頁】圖文導讀"):
                 res = model.generate_content(prompt)
                 st.markdown(res.text)
                 
-                # 3. iPad/手機音訊封裝
+                # 3. 音訊封裝
                 st.session_state.audio_html = asyncio.run(generate_voice_base64(res.text))
                 st.balloons()
             except Exception as e: st.error(f"導讀失敗：{e}")
