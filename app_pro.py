@@ -8,14 +8,26 @@ import re
 import base64
 from PIL import Image
 
-# --- 1. 頁面配置 (全平台抗暗色模式 & 翩翩體鎖定) ---
+# --- 1. 頁面配置 (全能適配 + 強制白晝協議強化版) ---
 st.set_page_config(page_title="生物 AI 生命真理研究室", layout="wide")
 
 st.markdown("""
     <style>
-    /* 1. 強制背景鎖定為白色 (防黑洞協議) */
-    .stApp, [data-testid="stAppViewContainer"], [data-testid="stHeader"], [data-testid="stToolbar"] {
+    /* 1. 強制背景鎖定為白色 (白晝協議 - 包含手機系統級覆蓋) */
+    .stApp, [data-testid="stAppViewContainer"], [data-testid="stHeader"], [data-testid="stToolbar"], .stMain {
         background-color: #ffffff !important;
+    }
+
+    /* 針對手機「深色模式」的硬性反射指令 */
+    @media (prefers-color-scheme: dark) {
+        .stApp, [data-testid="stAppViewContainer"], [data-testid="stHeader"], [data-testid="stToolbar"], .stMain {
+            background-color: #ffffff !important;
+        }
+        /* 確保暗色模式下的輸入框也是白的 */
+        input, select, textarea {
+            background-color: #ffffff !important;
+            color: #000000 !important;
+        }
     }
 
     /* 2. 鎖定全黑翩翩體與字體堆疊 */
@@ -34,9 +46,9 @@ st.markdown("""
         margin-bottom: 20px;
     }
 
-    /* 4. 按鈕防黑修正：維持您的淺藍色風格，但強制背景不變黑 */
+    /* 4. 按鈕防黑修正：維持您的淺藍色風格，但強制不變黑 */
     div.stButton > button {
-        background-color: #e1f5fe !important; /* 您的標誌淺藍色 */
+        background-color: #e1f5fe !important; 
         color: #000000 !important;
         border: 2px solid #01579b !important;
         border-radius: 8px !important;
@@ -47,14 +59,8 @@ st.markdown("""
         opacity: 1 !important;
     }
     
-    /* 5. 輸入框防黑修正 (防止手機輸入時變黑底) */
-    input {
-        color: #000000 !important;
-        background-color: #ffffff !important;
-    }
-
-    /* 6. LaTeX 公式顏色鎖定 */
-    .katex {
+    /* 5. LaTeX 公式與連結顏色鎖定 */
+    .katex, a {
         color: #000000 !important;
     }
     </style>
@@ -82,7 +88,7 @@ def get_pdf_page_image(pdf_path, page_index):
     doc.close()
     return img_data
 
-# --- 4. 生物講義 26 頁熱血中二標題 (精確保留) ---
+# --- 4. 生物講義 26 頁熱血中二標題 (完整保留) ---
 page_titles = {
     1: "【視覺的覺醒——顯微鏡的物理法則】", 
     2: "【影像的禁忌與雙重存在——複式 vs 解剖】", 
