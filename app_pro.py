@@ -8,61 +8,54 @@ import re
 import base64
 from PIL import Image
 
-# --- 1. 頁面配置 (全平台抗暗色模式 & 翩翩體鎖定) ---
+# --- 1. 頁面配置 (行動/平版雙模適配 + 深度白晝協議) ---
 st.set_page_config(page_title="生物 AI 生命真理研究室", layout="wide")
 
 st.markdown("""
     <style>
-    /* 1. 強制背景鎖定為白色 */
+    /* A. 全域白晝協議：強制所有載具背景為白色，文字為全黑 */
     .stApp, [data-testid="stAppViewContainer"], [data-testid="stHeader"], [data-testid="stToolbar"], .stMain {
         background-color: #ffffff !important;
     }
-
-    /* 2. 鎖定全黑翩翩體 */
-    html, body, [class*="css"], .stMarkdown, p, h1, h2, h3, span, label, li {
+    html, body, [class*="css"], .stMarkdown, p, span, label, li {
         color: #000000 !important;
         font-family: 'HanziPen SC', '翩翩體', 'PingFang TC', 'Heiti TC', 'Microsoft JhengHei', sans-serif !important;
     }
 
-    /* 3. 深度修正：打字區 (強制白底黑字) */
-    div[data-testid="stTextInput"] input {
+    /* B. 雙模適配：行動端自動縮減邊距，確保講義圖片最大化 */
+    [data-testid="stAppViewBlockContainer"] {
+        padding: 1.5rem 1rem !important;
+    }
+    
+    /* 標題字體隨螢幕寬度彈性縮放 */
+    h1 { font-size: calc(1.4rem + 1.2vw) !important; text-align: center; }
+    h3 { font-size: calc(1.1rem + 0.5vw) !important; }
+
+    /* C. 終極解鎖：針對蘋果手機「拉把 (Selectbox)」彈出選單的黑底修正 */
+    div[data-baseweb="popover"], div[data-baseweb="listbox"], ul[role="listbox"], li[role="option"] {
         background-color: #ffffff !important;
         color: #000000 !important;
-        -webkit-text-fill-color: #000000 !important; /* 針對 iOS 強制黑字 */
+    }
+    li[role="option"] div, li[role="option"] span {
+        color: #000000 !important;
+        background-color: #ffffff !important;
+    }
+
+    /* D. 組件鎖定：打字區與下拉選單本體 (白底黑字) */
+    div[data-testid="stTextInput"] input, div[data-baseweb="select"], div[data-baseweb="select"] > div {
+        background-color: #ffffff !important;
+        color: #000000 !important;
+        -webkit-text-fill-color: #000000 !important;
         border: 2px solid #000000 !important;
     }
 
-    /* 4. 深度修正：拍照上傳區 (強制白底黑字 + 按鈕中文化) */
-    [data-testid="stFileUploader"] section {
-        background-color: #ffffff !important;
-        color: #000000 !important;
-        border: 2px dashed #000000 !important;
-    }
-    
-    /* 針對 "Browse files" 按鈕的強效校準 */
-    [data-testid="stFileUploader"] button {
-        background-color: #ffffff !important;
-        color: #000000 !important;
-        border: 1px solid #000000 !important;
-    }
-    
-    /* 強制將 Browse files 換成中文 "瀏覽檔案" */
-    [data-testid="stFileUploader"] button div span {
-        font-size: 0 !important; /* 隱藏原文 */
-    }
-    [data-testid="stFileUploader"] button div span::before {
-        content: "瀏覽檔案" !important;
-        font-size: 1rem !important;
-        color: #000000 !important;
-    }
+    /* E. 拍照截圖區：中文化與白晝鎖定 */
+    [data-testid="stFileUploader"] section { background-color: #ffffff !important; border: 2px dashed #000000 !important; }
+    [data-testid="stFileUploader"] button { background-color: #ffffff !important; color: #000000 !important; border: 1px solid #000000 !important; }
+    [data-testid="stFileUploader"] button div span { font-size: 0 !important; }
+    [data-testid="stFileUploader"] button div span::before { content: "瀏覽檔案" !important; font-size: 1rem !important; color: #000000 !important; }
 
-    /* 5. 下拉選單 (拉把) 鎖定 */
-    div[data-baseweb="select"], div[data-baseweb="select"] > div {
-        background-color: #ffffff !important;
-        color: #000000 !important;
-    }
-
-    /* 6. 您的黃色導覽框鎖定 */
+    /* F. 您原本的黃色導覽框鎖定 */
     .guide-box {
         background-color: #fff9c4 !important;
         color: #000000 !important;
@@ -72,27 +65,21 @@ st.markdown("""
         margin-bottom: 20px;
     }
 
-    /* 7. 按鈕防黑修正：維持您的淺藍色風格 */
+    /* G. 按鈕行動優化：寬度 100% 方便操作 */
     div.stButton > button {
         background-color: #e1f5fe !important; 
         color: #000000 !important;
         border: 2px solid #01579b !important;
-        border-radius: 8px !important;
-        font-weight: bold !important;
+        border-radius: 12px !important;
         width: 100% !important;
-        height: 50px !important;
-        font-size: 1.2rem !important;
-        opacity: 1 !important;
+        height: 3.5rem !important;
+        font-weight: bold !important;
     }
 
-    /* 8. LaTeX 公式顏色鎖定 */
-    .katex {
-        color: #000000 !important;
-    }
-
-    /* 針對手機暗色模式的終極覆蓋 */
+    /* H. LaTeX 顏色鎖定與暗色模式覆蓋 */
+    .katex { color: #000000 !important; }
     @media (prefers-color-scheme: dark) {
-        .stApp, div[data-testid="stTextInput"] input, section[data-testid="stFileUploader"], [data-testid="stFileUploader"] button {
+        .stApp, div[data-testid="stTextInput"] input, section[data-testid="stFileUploader"], [data-testid="stFileUploader"] button, div[data-baseweb="popover"] {
             background-color: #ffffff !important;
             color: #000000 !important;
         }
