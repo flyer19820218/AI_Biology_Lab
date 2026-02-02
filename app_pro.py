@@ -24,31 +24,45 @@ st.markdown("""
         font-family: 'HanziPen SC', '翩翩體', 'PingFang TC', 'Heiti TC', 'Microsoft JhengHei', sans-serif !important;
     }
 
-    /* 3. 針對【打字提問區】與【拍照截圖區】的深度補光 (強制白底黑字) */
-    /* 打字輸入框本體 */
+    /* 3. 深度修正：打字區 (強制白底黑字) */
     div[data-testid="stTextInput"] input {
         background-color: #ffffff !important;
         color: #000000 !important;
+        -webkit-text-fill-color: #000000 !important; /* 針對 iOS 強制黑字 */
         border: 2px solid #000000 !important;
     }
-    /* 拍照上傳區邊框與內部背景 */
+
+    /* 4. 深度修正：拍照上傳區 (強制白底黑字 + 按鈕中文化) */
     [data-testid="stFileUploader"] section {
         background-color: #ffffff !important;
         color: #000000 !important;
         border: 2px dashed #000000 !important;
     }
-    /* 修正上傳區內部的文字與提示 */
-    [data-testid="stFileUploader"] div, [data-testid="stFileUploader"] span, [data-testid="stFileUploader"] p {
+    
+    /* 針對 "Browse files" 按鈕的強效校準 */
+    [data-testid="stFileUploader"] button {
+        background-color: #ffffff !important;
         color: #000000 !important;
+        border: 1px solid #000000 !important;
     }
     
-    /* 4. 下拉選單 (拉把) 鎖定 */
+    /* 強制將 Browse files 換成中文 "瀏覽檔案" */
+    [data-testid="stFileUploader"] button div span {
+        font-size: 0 !important; /* 隱藏原文 */
+    }
+    [data-testid="stFileUploader"] button div span::before {
+        content: "瀏覽檔案" !important;
+        font-size: 1rem !important;
+        color: #000000 !important;
+    }
+
+    /* 5. 下拉選單 (拉把) 鎖定 */
     div[data-baseweb="select"], div[data-baseweb="select"] > div {
         background-color: #ffffff !important;
         color: #000000 !important;
     }
 
-    /* 5. 您的黃色導覽框鎖定 */
+    /* 6. 您的黃色導覽框鎖定 */
     .guide-box {
         background-color: #fff9c4 !important;
         color: #000000 !important;
@@ -58,7 +72,7 @@ st.markdown("""
         margin-bottom: 20px;
     }
 
-    /* 6. 按鈕防黑修正：維持您的淺藍色風格 */
+    /* 7. 按鈕防黑修正：維持您的淺藍色風格 */
     div.stButton > button {
         background-color: #e1f5fe !important; 
         color: #000000 !important;
@@ -71,14 +85,14 @@ st.markdown("""
         opacity: 1 !important;
     }
 
-    /* 7. LaTeX 公式顏色鎖定 */
+    /* 8. LaTeX 公式顏色鎖定 */
     .katex {
         color: #000000 !important;
     }
 
-    /* 針對手機暗色模式的硬性覆蓋 */
+    /* 針對手機暗色模式的終極覆蓋 */
     @media (prefers-color-scheme: dark) {
-        .stApp, div[data-testid="stTextInput"] input, section[data-testid="stFileUploader"] {
+        .stApp, div[data-testid="stTextInput"] input, section[data-testid="stFileUploader"], [data-testid="stFileUploader"] button {
             background-color: #ffffff !important;
             color: #000000 !important;
         }
