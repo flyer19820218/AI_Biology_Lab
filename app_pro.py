@@ -160,7 +160,7 @@ st.divider()
 # --- 7. 學生提問區 ---
 st.subheader("💬 生命真理提問區")
 col_q, col_up = st.columns([1, 1])
-with col_q: student_q = st.text_input("打字問助教：", placeholder="例如：為什麼水可以滅火？")
+with col_q: student_q = st.text_input("打字問助教：", placeholder="例如：酵素的成份是什麼？")
 with col_up: uploaded_file = st.file_uploader("拍照或截圖：", type=["jpg", "png", "jpeg"])
 
 if (student_q or uploaded_file) and user_key:
